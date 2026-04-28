@@ -91,7 +91,7 @@ watch(keyword, () => {
           </li>
         </ul>
       </div>
-      <button class="search-btn" @click="handleSearch">百度一下</button>
+      <button class="search-btn" @click="handleSearch">搜索</button>
     </div>
   </div>
 </template>
@@ -136,7 +136,7 @@ watch(keyword, () => {
 }
 
 input {
-  width: 100%;
+  width: 510px;
   height: 44px;
   padding: 12px 15px;
   font-size: 16px;
@@ -152,7 +152,7 @@ input:focus {
 
 .search-btn {
   width: 108px;
-  height: 48px;
+  height: 70px;
   background: #4e6ef2;
   color: white;
   border: none;
@@ -180,7 +180,7 @@ input:focus {
   margin: 0;
   text-align: left;
   z-index: 100;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   border-radius: 0 0 8px 8px;
 }
 

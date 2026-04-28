@@ -74,8 +74,9 @@ const onDragEnd = () => {
              :target="isEditing ? '' : '_blank'"
              class="site-link">
             <div class="icon-wrapper">
-              <img :src="`https://www.google.com/s2/favicons?domain=${getDomain(element.url)}&sz=64`"
-                   @error="(e) => e.target.src='https://via.placeholder.com/64?text=?'" />
+              <img
+                :src="`https://www.google.com/s2/favicons?domain=${getDomain(element.url)}&sz=64`"
+                @error="(e) => e.target.src='https://via.placeholder.com/64?text=?'" />
             </div>
             <span class="site-name">{{ element.name }}</span>
           </a>
@@ -116,6 +117,22 @@ const onDragEnd = () => {
 </template>
 
 <style scoped>
+.nav-header {
+  height: 60px;
+  display: flex;
+  gap: 20px;
+
+}
+
+.edit-btn {
+  width: 80px;
+  height: 28px;
+  border-radius: 6px;
+  background-color: #4d6df0;
+  border: none;
+  color: #ffffff;
+}
+
 /* 保持之前的 grid 样式 */
 .nav-grid {
   display: grid;
@@ -124,35 +141,146 @@ const onDragEnd = () => {
   min-height: 100px;
 }
 
-.site-card { position: relative; display: flex; flex-direction: column; align-items: center; }
-.icon-wrapper { width: 60px; height: 60px; background: #fff; border-radius: 16px; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 8px; }
-.icon-wrapper img { width: 32px; height: 32px; }
-
-.plus-icon { border: 2px dashed #ccc; background: none; color: #999; font-size: 24px; cursor: pointer; }
-
-/* 拖拽虚影 */
-.ghost { opacity: 0.3; background: #e0e0e0; border-radius: 16px; }
-
-/* 抖动动画 */
-.shake { animation: shake-move 0.3s infinite; }
-@keyframes shake-move {
-  0% { transform: rotate(1deg); }
-  50% { transform: rotate(-1deg); }
-  100% { transform: rotate(1deg); }
+.site-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.del-tag { position: absolute; top: -5px; right: 10px; background: #ff4d4f; color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 14px; cursor: pointer; border: 2px solid #fff; }
+.icon-wrapper {
+  width: 60px;
+  height: 60px;
+  background: #fff;
+  border-radius: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  margin-bottom: 8px;
+}
+
+.icon-wrapper img {
+  width: 32px;
+  height: 32px;
+}
+
+.plus-icon {
+  border: 2px dashed #ccc;
+  background: none;
+  color: #999;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+/* 拖拽虚影 */
+.ghost {
+  opacity: 0.3;
+  background: #e0e0e0;
+  border-radius: 16px;
+}
+
+/* 抖动动画 */
+.shake {
+  animation: shake-move 0.3s infinite;
+}
+
+@keyframes shake-move {
+  0% {
+    transform: rotate(1deg);
+  }
+  50% {
+    transform: rotate(-1deg);
+  }
+  100% {
+    transform: rotate(1deg);
+  }
+}
+
+.del-tag {
+  position: absolute;
+  top: -5px;
+  right: 10px;
+  background: #ff4d4f;
+  color: white;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  cursor: pointer;
+  border: 2px solid #fff;
+}
 
 /* Dialog 样式 */
-.dialog-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; z-index: 9999; }
-.dialog-content { background: white; padding: 25px; border-radius: 20px; width: 320px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
-.form-item { margin-bottom: 15px; text-align: left; }
-.form-item label { display: block; font-size: 12px; color: #888; margin-bottom: 5px; }
-.form-item input { width: 100%; padding: 10px; border: 1px solid #eee; border-radius: 8px; outline: none; }
-.dialog-footer { display: flex; gap: 10px; margin-top: 20px; }
-.dialog-footer button { flex: 1; padding: 10px; border-radius: 8px; border: none; cursor: pointer; }
-.btn-confirm { background: #4e6ef2; color: white; }
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
 
-.fade-enter-active, .fade-leave-active { transition: opacity 0.3s; }
-.fade-enter-from, .fade-leave-to { opacity: 0; }
+.dialog-content {
+  background: white;
+  padding: 25px;
+  border-radius: 20px;
+  width: 320px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.form-item {
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.form-item label {
+  display: block;
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 5px;
+}
+
+.form-item input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  outline: none;
+}
+
+.dialog-footer {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.dialog-footer button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-confirm {
+  background: #4e6ef2;
+  color: white;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s;
+}
+
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
 </style>
