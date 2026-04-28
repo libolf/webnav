@@ -124,7 +124,7 @@ const onDragEnd = () => {
   margin: 0 auto;       /* 水平居中，两侧自动留空 */
 
   /* 辅助配置 */
-  padding: 40px 0;      /* 上下留 40px 间距，左右边距由 margin 处理 */
+  padding: 20px 0;      /* 上下留 40px 间距，左右边距由 margin 处理 */
 }
 .nav-header {
   height: 10px;
