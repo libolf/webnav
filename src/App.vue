@@ -7,6 +7,9 @@ import NavGrid from './components/NavGrid.vue'
 const isShowLogin = ref(false)
 const loginName = ref('')
 
+
+// todo 刷新时不着急先删除，等获取完后再删除重新加载
+
 // 页面加载逻辑
 onMounted(() => {
   // 如果本地有昵称，store 会在初始化时尝试恢复
