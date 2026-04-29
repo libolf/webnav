@@ -91,6 +91,7 @@ const handleSearch = () => {
   if (!keyword.value.trim()) return
   window.open(engines[currentEngine.value].url + encodeURIComponent(keyword.value), '_blank')
   showSuggest.value = false
+  keyword.value = ""
 }
 
 const selectSuggest = (text) => {
