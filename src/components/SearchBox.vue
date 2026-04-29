@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, onMounted, onUnmounted, computed } from 'vue'
+import { ref, watch, onMounted, onUnmounted, computed, nextTick } from 'vue'
 
 // --- 搜索引擎配置 (保持不变) ---
 const engines = {
@@ -10,6 +10,7 @@ const engines = {
 
 const currentEngine = ref('baidu')
 const keyword = ref('')
+const keywordInput = ref(null)
 const suggestions = ref([])
 const showSuggest = ref(false)
 const hotNews = ref([])
@@ -40,7 +41,7 @@ const startScroll = () => {
   if (totalGroups.value <= 1) return
   scrollTimer = setInterval(() => {
     offsetIndex.value = (offsetIndex.value + 1) % totalGroups.value
-  }, 4000)
+  }, 6000)
 }
 
 const stopScroll = () => clearInterval(scrollTimer)
@@ -52,14 +53,38 @@ const handleClickOutside = (e) => {
   }
 }
 
+const handleGlobalKeydown = (e) => {
+  // 识别 Ctrl + Q (同时支持大写和小写 Q)
+  if (e.altKey && (e.key === 'q' || e.key === 'Q')) {
+    e.preventDefault(); // 阻止浏览器默认行为（如果有的话）
+
+    const engineKeys = Object.keys(engines);
+    const currentIndex = engineKeys.indexOf(currentEngine.value);
+
+    // 1. 计算下一个引擎的 key
+    const nextIndex = (currentIndex + 1) % engineKeys.length;
+    currentEngine.value = engineKeys[nextIndex];
+
+    // 2. 自动使输入框获得焦点
+    // 使用 nextTick 确保 DOM 更新（虽然 ref 切换通常很快，但这是好习惯）
+    nextTick(() => {
+      if (keywordInput.value) {
+        keywordInput.value.focus();
+      }
+    });
+  }
+};
+
 onMounted(() => {
   fetchHot()
   document.addEventListener('click', handleClickOutside)
+  window.addEventListener('keydown', handleGlobalKeydown);
 })
 
 onUnmounted(() => {
   stopScroll()
   document.removeEventListener('click', handleClickOutside)
+  document.removeEventListener('keydown', handleGlobalKeydown)
 })
 
 const handleSearch = () => {
@@ -116,7 +141,7 @@ watch(keyword, (newVal) => {
 
     <div class="search-bar">
       <div class="input-wrapper">
-        <input type="text" v-model="keyword" @keyup.enter="handleSearch" @focus="handleInputFocus"
+        <input ref="keywordInput" type="text" v-model="keyword" @keyup.enter="handleSearch" @focus="handleInputFocus"
                placeholder="输入搜索内容..." />
         <Transition name="fade">
           <ul v-if="showSuggest" class="suggest-panel">

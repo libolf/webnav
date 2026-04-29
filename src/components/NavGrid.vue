@@ -2,6 +2,7 @@
 import { store } from '../utils/store.js'
 import { ref, reactive, nextTick } from 'vue'
 import draggable from 'vuedraggable'
+import defaultIcon from '@/assets/default.png'
 
 const isEditing = ref(false)
 const isShowDialog = ref(false)
@@ -73,9 +74,12 @@ const onDragEnd = () => {
              :target="isEditing ? '' : '_blank'"
              class="site-link">
             <div class="icon-wrapper">
+              <!--<img-->
+              <!--  :src="store.getIconFromCache(element.url) || `https://www.google.com/s2/favicons?sz=64&domain=${getDomain(element.url)}`"/>-->
               <img
-                :src="store.getIconFromCache(element.url) || `https://unavatar.io/duckduckgo/${getDomain(element.url)}`"
-                @error="(e) => e.target.src='https://via.placeholder.com/64?text=?'"
+                :src="store.getIconFromCache(element.url) || `/api/icon?domain=${getDomain(element.url)}`"
+                @load="store.handleImageLoad(element.url)"
+                @error="(e) => e.target.src=defaultIcon"
               />
             </div>
             <span class="site-name">{{ element.name }}</span>

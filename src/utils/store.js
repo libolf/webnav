@@ -82,33 +82,42 @@ export const store = reactive({
   // 辅助方法：从本地图标库获取图标，没有则返回默认图
   getIconFromCache(url) {
     const iconsMap = JSON.parse(localStorage.getItem(ICONS_CACHE_KEY) || '{}')
+    console.log("icon from cache " + url + " " + iconsMap[url] == null)
     return iconsMap[url] || null // 返回 null 表示没缓存，需要去拉取
+  },
+
+  // 触发抓取并持久化到本地
+  async handleImageLoad(url) {
+    // 如果缓存里已经有了，就不再重复下载转码
+    if (this.getIconFromCache(url)) return
+
+    const base64 = await this.downloadAndCacheIcon(url)
+    if (base64) {
+      const iconsMap = JSON.parse(localStorage.getItem(ICONS_CACHE_KEY) || '{}')
+      iconsMap[url] = base64
+      localStorage.setItem(ICONS_CACHE_KEY, JSON.stringify(iconsMap))
+      // 注意：这里不需要强制刷新 this.sites，因为图标是按需从缓存读的
+    }
   },
 
   // 核心：抓取并保存图标
   async downloadAndCacheIcon(url) {
-    const domain = new URL(url).hostname
-    // 使用一个更友好的图标接口（部分接口支持更好的跨域）
-    const apiUrl = `https://unavatar.io/duckduckgo/${domain}`
-
     try {
-      const response = await fetch(apiUrl)
-      const blob = await response.blob()
+      const domain = new URL(url).hostname
+      // 请求你部署在 Vercel 的中转接口
+      const res = await fetch(`/api/icon?domain=${domain}`)
+
+      if (!res.ok) return null
+
+      const blob = await res.blob()
 
       return new Promise((resolve) => {
         const reader = new FileReader()
-        reader.onloadend = () => {
-          const base64 = reader.result
-          // 存入本地
-          const iconsMap = JSON.parse(localStorage.getItem(ICONS_CACHE_KEY) || '{}')
-          iconsMap[url] = base64
-          localStorage.setItem(ICONS_CACHE_KEY, JSON.stringify(iconsMap))
-          resolve(base64)
-        }
+        reader.onloadend = () => resolve(reader.result) // 返回 Base64
         reader.readAsDataURL(blob)
       })
-    } catch (e) {
-      console.warn('图标拉取失败:', e)
+    } catch (error) {
+      console.error('图标缓存处理失败:', error)
       return null
     }
   },

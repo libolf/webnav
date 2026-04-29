@@ -83,15 +83,6 @@ onMounted(() => {
   if (store.nickName) {
     store.loginAndFetch(store.nickName)
   }
-
-  // 图标静默缓存逻辑：延迟2秒执行，避开首屏压力
-  setTimeout(() => {
-    store.sites.forEach(async (site) => {
-      if (!store.getIconFromCache(site.url)) {
-        await store.downloadAndCacheIcon(site.url)
-      }
-    })
-  }, 2000)
 })
 
 // --- 原有交互逻辑 ---
