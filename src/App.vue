@@ -120,8 +120,8 @@ const handleTopToolClick = (type) =>{
 </script>
 
 <template>
-  <div class="app-wrapper" @click="handleTopToolClick(3)">
-    <header class="main-header">
+  <div class="app-wrapper">
+    <header class="main-header" @click="handleTopToolClick(3)">
       <div class="header-left" @click="handleTopToolClick(1)">
         <div class="calendar-card">
           <span class="m-label">{{ new Date().getMonth() + 1 }}月</span>
