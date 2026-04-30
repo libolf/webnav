@@ -1,5 +1,6 @@
 <script setup>
 import { ref, watch, onMounted, onUnmounted, computed, nextTick } from 'vue'
+import { store } from '@/utils/store.js'
 
 // --- 搜索引擎配置 (保持不变) ---
 const engines = {
@@ -56,29 +57,29 @@ const handleClickOutside = (e) => {
 const handleGlobalKeydown = (e) => {
   // 识别 Ctrl + Q (同时支持大写和小写 Q)
   if (e.altKey && (e.key === 'q' || e.key === 'Q')) {
-    e.preventDefault(); // 阻止浏览器默认行为（如果有的话）
+    e.preventDefault() // 阻止浏览器默认行为（如果有的话）
 
-    const engineKeys = Object.keys(engines);
-    const currentIndex = engineKeys.indexOf(currentEngine.value);
+    const engineKeys = Object.keys(engines)
+    const currentIndex = engineKeys.indexOf(currentEngine.value)
 
     // 1. 计算下一个引擎的 key
-    const nextIndex = (currentIndex + 1) % engineKeys.length;
-    currentEngine.value = engineKeys[nextIndex];
+    const nextIndex = (currentIndex + 1) % engineKeys.length
+    currentEngine.value = engineKeys[nextIndex]
 
     // 2. 自动使输入框获得焦点
     // 使用 nextTick 确保 DOM 更新（虽然 ref 切换通常很快，但这是好习惯）
     nextTick(() => {
       if (keywordInput.value) {
-        keywordInput.value.focus();
+        keywordInput.value.focus()
       }
-    });
+    })
   }
-};
+}
 
 onMounted(() => {
   fetchHot()
   document.addEventListener('click', handleClickOutside)
-  window.addEventListener('keydown', handleGlobalKeydown);
+  window.addEventListener('keydown', handleGlobalKeydown)
 })
 
 onUnmounted(() => {
@@ -91,7 +92,8 @@ const handleSearch = () => {
   if (!keyword.value.trim()) return
   window.open(engines[currentEngine.value].url + encodeURIComponent(keyword.value), '_blank')
   showSuggest.value = false
-  keyword.value = ""
+  store.saveSearchHistory(keyword.value)
+  keyword.value = ''
 }
 
 const selectSuggest = (text) => {
@@ -100,15 +102,30 @@ const selectSuggest = (text) => {
 }
 
 const handleInputFocus = () => {
-  if (suggestions.value.length > 0) showSuggest.value = true
+  if (suggestions.value.length > 0) {
+    showSuggest.value = true
+  } else {
+    const searchHistory = store.getSearchHistory()
+    if (searchHistory.length > 0) {
+      showSuggest.value = true
+      suggestions.value = searchHistory
+    }
+  }
+
 }
 
 let suggestTimer = null
 watch(keyword, (newVal) => {
   clearTimeout(suggestTimer)
   if (!newVal.trim()) {
-    suggestions.value = []
-    showSuggest.value = false
+    const searchHistory = store.getSearchHistory()
+    if (searchHistory.length > 0) {
+      showSuggest.value = true
+      suggestions.value = searchHistory
+    } else {
+      suggestions.value = []
+      showSuggest.value = false
+    }
     return
   }
   suggestTimer = setTimeout(async () => {
@@ -142,7 +159,8 @@ watch(keyword, (newVal) => {
 
     <div class="search-bar">
       <div class="input-wrapper">
-        <input ref="keywordInput" type="text" v-model="keyword" @keyup.enter="handleSearch" @focus="handleInputFocus"
+        <input ref="keywordInput" type="text" v-model="keyword" @keyup.enter="handleSearch"
+               @focus="handleInputFocus"
                placeholder="输入搜索内容..." />
         <Transition name="fade">
           <ul v-if="showSuggest" class="suggest-panel">
@@ -469,6 +487,9 @@ input {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
   border: 1px solid #eee;
   text-align: left;
+  max-height: 400px;      /* 你可以根据需要调整这个像素值 */
+  overflow-y: auto;       /* 内容超出时显示垂直滚动条 */
+  overflow-x: hidden;     /* 隐藏水平溢出 */
 }
 
 .suggest-panel li {
@@ -480,6 +501,23 @@ input {
 .suggest-panel li:hover {
   background: #f5f7ff;
   color: #4e6ef2;
+}
+
+.suggest-panel::-webkit-scrollbar {
+  width: 6px;
+}
+
+.suggest-panel::-webkit-scrollbar-thumb {
+  background: #e0e0e0;
+  border-radius: 10px;
+}
+
+.suggest-panel::-webkit-scrollbar-thumb:hover {
+  background: #ccc;
+}
+
+.suggest-panel::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .fade-enter-active, .fade-leave-active {

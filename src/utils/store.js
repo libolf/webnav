@@ -10,6 +10,7 @@ const supabase = createClient(
 // 缓存 Key
 const SITES_CACHE_KEY = 'nav_sites_cache'
 const ICONS_CACHE_KEY = 'nav_icons_cache'
+const SEARCH_HISTORY_KEY = 'nav_search_history'
 
 export const store = reactive({
   uid: localStorage.getItem('nav_uid') || null,
@@ -82,7 +83,7 @@ export const store = reactive({
   // 辅助方法：从本地图标库获取图标，没有则返回默认图
   getIconFromCache(url) {
     const iconsMap = JSON.parse(localStorage.getItem(ICONS_CACHE_KEY) || '{}')
-    console.log("icon from cache " + url + " " + iconsMap[url] == null)
+    console.log('icon from cache ' + url + ' ' + iconsMap[url] == null)
     return iconsMap[url] || null // 返回 null 表示没缓存，需要去拉取
   },
 
@@ -120,6 +121,19 @@ export const store = reactive({
       console.error('图标缓存处理失败:', error)
       return null
     }
+  },
+
+  saveSearchHistory(searchText) {
+    const searchHistory = JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY) || '[]')
+    if (searchHistory.length >= 20) {
+      searchHistory.pop()
+    }
+    searchHistory.unshift(searchText)
+    localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(searchHistory))
+  },
+
+  getSearchHistory() {
+    return JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY) || '[]')
   },
 
   logout() {
