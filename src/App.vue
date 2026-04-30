@@ -105,12 +105,24 @@ const submitLogin = async () => {
     alert('请输入昵称')
   }
 }
+
+const handleTopToolClick = (type) =>{
+  let url
+  if (type === 1) {
+    url = "https://www.baidu.com/s?wd=" + encodeURIComponent("日历")
+  } else if (type === 2) {
+    url = "https://www.baidu.com/s?wd=" + encodeURIComponent("天气")
+  } else {
+    url = "https://map.baidu.com/"
+  }
+  window.open(url, '_blank')
+}
 </script>
 
 <template>
-  <div class="app-wrapper">
+  <div class="app-wrapper" @click="handleTopToolClick(3)">
     <header class="main-header">
-      <div class="header-left">
+      <div class="header-left" @click="handleTopToolClick(1)">
         <div class="calendar-card">
           <span class="m-label">{{ new Date().getMonth() + 1 }}月</span>
           <span class="d-label">{{ new Date().getDate() }}</span>
@@ -121,7 +133,7 @@ const submitLogin = async () => {
         </div>
       </div>
 
-      <div class="header-right">
+      <div class="header-right" @click="handleTopToolClick(2)">
         <div v-if="weatherData.today.desc" class="weather-panel">
           <div class="w-section">
             <span class="w-label">今日</span>
@@ -185,7 +197,7 @@ const submitLogin = async () => {
 }
 
 /* 左侧日期样式 */
-.header-left { display: flex; align-items: center; gap: 15px; }
+.header-left { display: flex; align-items: center; gap: 15px; cursor: pointer}
 .calendar-card {
   width: 42px; height: 42px; border: 2px solid #333; border-radius: 10px;
   display: flex; flex-direction: column; overflow: hidden;
@@ -196,7 +208,7 @@ const submitLogin = async () => {
 .lunar-text { font-size: 15px; color: #fa8c16; }
 
 /* 右侧天气与用户 */
-.header-right { display: flex; align-items: center; gap: 20px; }
+.header-right { display: flex; align-items: center; gap: 20px; cursor: pointer}
 .weather-panel {
   display: flex; align-items: center; gap: 12px;
   background: #f8f9fa; padding: 6px 16px; border-radius: 20px; border: 1px solid #eee;
