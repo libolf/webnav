@@ -20,6 +20,8 @@ const offsetIndex = ref(0)
 const searchContainer = ref(null)
 let scrollTimer = null
 
+const selectIndex = ref(-1) // 当前键盘选中的建议项索引，-1 表示未选中
+
 const totalGroups = computed(() => Math.ceil(hotNews.value.length / 6))
 
 const fetchHot = async () => {
@@ -52,6 +54,43 @@ const handleClickOutside = (e) => {
     isExpanded.value = false
     showSuggest.value = false
   }
+}
+
+
+// 监听键盘上下键与回车
+const handleKeyDown = (e) => {
+  if (!showSuggest.value || suggestions.value.length === 0) return
+
+  if (e.key === 'ArrowDown') {
+    e.preventDefault() // 阻止光标移到末尾
+    // 往下递增，到末尾后循环回 -1
+    selectIndex.value = (selectIndex.value + 1) >= suggestions.value.length ? -1 : selectIndex.value + 1
+    scrollActiveIntoView()
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault() // 阻止光标移到开头
+    // 往上递减，到 -1 后循环回末尾
+    selectIndex.value = selectIndex.value <= -1 ? suggestions.value.length - 1 : selectIndex.value - 1
+    scrollActiveIntoView()
+  } else if (e.key === 'Enter') {
+    // 如果有选中的建议项，直接回车搜索该项
+    if (selectIndex.value > -1 && selectIndex.value < suggestions.value.length) {
+      e.preventDefault() // 阻止 input 默认的 enter 事件
+      keyword.value = suggestions.value[selectIndex.value]
+      handleSearch()
+    }
+  }
+}
+
+// 确保选中的项在滚动视图内
+const scrollActiveIntoView = () => {
+  nextTick(() => {
+    const activeEl = document.querySelector('.suggest-panel li.active-item')
+    if (activeEl) {
+      activeEl.scrollIntoView({
+        block: 'nearest' // 滚动到最近的边缘，避免剧烈跳动
+      })
+    }
+  })
 }
 
 const handleGlobalKeydown = (e) => {
@@ -94,12 +133,13 @@ const handleSearch = () => {
   const currentIndex = engineKeys.indexOf(currentEngine.value)
   let url = engines[currentEngine.value].url + encodeURIComponent(keyword.value)
   if (currentIndex === 2) {
-    url = url + "&ensearch=1"
+    url = url + '&ensearch=1'
   }
   window.open(url, '_blank')
   showSuggest.value = false
   store.saveSearchHistory(keyword.value)
   keyword.value = ''
+  selectIndex.value = -1
 }
 
 const selectSuggest = (text) => {
@@ -133,6 +173,7 @@ watch(keyword, (newVal) => {
       suggestions.value = []
       showSuggest.value = false
     }
+    selectIndex.value = -1
     return
   }
   skipShowSearchHistory = false
@@ -194,11 +235,14 @@ watch(currentEngine, () => {
     <div class="search-bar">
       <div class="input-wrapper">
         <input ref="keywordInput" type="text" v-model="keyword" @keyup.enter="handleSearch"
+               @keydown="handleKeyDown"
                @focus="handleInputFocus"
                placeholder="输入搜索内容..." />
         <Transition name="fade">
           <ul v-if="showSuggest" class="suggest-panel">
-            <li v-for="(item, index) in suggestions" :key="index" @mousedown="selectSuggest(item)">
+            <li v-for="(item, index) in suggestions" :key="index"
+                :class="{ 'active-item': selectIndex === index }"
+                @mousedown="selectSuggest(item)">
               {{ item }}
             </li>
           </ul>
@@ -521,9 +565,9 @@ input {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
   border: 1px solid #eee;
   text-align: left;
-  max-height: 400px;      /* 你可以根据需要调整这个像素值 */
-  overflow-y: auto;       /* 内容超出时显示垂直滚动条 */
-  overflow-x: hidden;     /* 隐藏水平溢出 */
+  max-height: 400px; /* 你可以根据需要调整这个像素值 */
+  overflow-y: auto; /* 内容超出时显示垂直滚动条 */
+  overflow-x: hidden; /* 隐藏水平溢出 */
 }
 
 .suggest-panel li {
@@ -532,7 +576,8 @@ input {
   font-size: 14px;
 }
 
-.suggest-panel li:hover {
+.suggest-panel li:hover,
+.suggest-panel li.active-item {
   background: #f5f7ff;
   color: #4e6ef2;
 }
