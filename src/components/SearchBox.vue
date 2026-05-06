@@ -90,7 +90,13 @@ onUnmounted(() => {
 
 const handleSearch = () => {
   if (!keyword.value.trim()) return
-  window.open(engines[currentEngine.value].url + encodeURIComponent(keyword.value), '_blank')
+  const engineKeys = Object.keys(engines)
+  const currentIndex = engineKeys.indexOf(currentEngine.value)
+  let url = engines[currentEngine.value].url + encodeURIComponent(keyword.value)
+  if (currentIndex === 2) {
+    url = url + "&ensearch=1"
+  }
+  window.open(url, '_blank')
   showSuggest.value = false
   store.saveSearchHistory(keyword.value)
   keyword.value = ''

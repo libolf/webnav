@@ -125,8 +125,13 @@ export const store = reactive({
 
   saveSearchHistory(searchText) {
     const searchHistory = JSON.parse(localStorage.getItem(SEARCH_HISTORY_KEY) || '[]')
-    if (searchHistory.length >= 20) {
-      searchHistory.pop()
+    const index = searchHistory.indexOf(searchText)
+    if (index >= 0) {
+      searchHistory.splice(index, 1)
+    } else {
+      if (searchHistory.length >= 20) {
+        searchHistory.pop()
+      }
     }
     searchHistory.unshift(searchText)
     localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(searchHistory))
