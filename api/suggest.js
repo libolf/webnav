@@ -27,6 +27,7 @@ export default async function (req) {
       const target = `https://suggestqueries.google.com/complete/search?client=chrome&hl=zh-CN&q=${encodeURIComponent(wd)}`;
       const res = await fetch(target, { headers });
       const data = await res.json();
+      console.log("google " + data)
       // Google Chrome client 返回格式为: [ "关键词", ["建议1", "建议2", ...], ... ]
       list = data[1] || [];
 
@@ -35,6 +36,7 @@ export default async function (req) {
       const target = `https://api.bing.com/osjson.aspx?query=${encodeURIComponent(wd)}`;
       const res = await fetch(target, { headers });
       const data = await res.json();
+      console.log("bing " + data)
       // Bing 返回格式与 Google 类似: [ "关键词", ["建议1", "建议2", ... ] ]
       list = data[1] || [];
 
@@ -42,7 +44,12 @@ export default async function (req) {
       // 默认/百度兜底
       const target = `https://suggestion.baidu.com/su?prod=pc&wd=${encodeURIComponent(wd)}`;
       const res = await fetch(target, { headers });
-      const text = await res.text();
+      const arrayBuffer = await res.arrayBuffer();
+
+      // 使用 gbk/gb2312 解码器将二进制流转为 UTF-8 字符串
+      const decoder = new TextDecoder('gbk');
+      const text = decoder.decode(arrayBuffer);
+      console.log("baidu " + text)
       // 提取百度返回的 jsonp 数据（例如 window.baidu.sug({q:"...", s:["1","2"]})）
       const match = text.match(/s\:\[(.*?)\]/);
       if (match && match[1]) {
