@@ -135,19 +135,44 @@ watch(keyword, (newVal) => {
     return
   }
   suggestTimer = setTimeout(async () => {
-    const callbackName = `baidu_cb_${Date.now()}`
-    const script = document.createElement('script')
-    window[callbackName] = (data) => {
-      if (keyword.value.trim()) {
-        suggestions.value = data.s
-        showSuggest.value = suggestions.value.length > 0
+    try {
+      // 调用 Vercel 中转 API，并传入当前所选的引擎 `currentEngine.value`
+      const res = await fetch(`/api/suggest?engine=${currentEngine.value}&wd=${encodeURIComponent(newVal.trim())}`)
+      if (res.ok) {
+        const data = await res.json()
+        // 确保异步返回时，用户输入的内容没有被清空，再更新列表
+        if (keyword.value.trim()) {
+          suggestions.value = data
+          showSuggest.value = suggestions.value.length > 0
+        }
       }
-      document.body.removeChild(script)
-      delete window[callbackName]
+    } catch (e) {
+      console.error('获取联想词失败:', e)
     }
-    script.src = `https://suggestion.baidu.com/su?wd=${encodeURIComponent(keyword.value)}&cb=${callbackName}`
-    document.body.appendChild(script)
+//    const callbackName = `baidu_cb_${Date.now()}`
+//    const script = document.createElement('script')
+//    window[callbackName] = (data) => {
+//      if (keyword.value.trim()) {
+//        suggestions.value = data.s
+//        showSuggest.value = suggestions.value.length > 0
+//      }
+//      document.body.removeChild(script)
+//      delete window[callbackName]
+//    }
+//    script.src = `https://suggestion.baidu.com/su?wd=${encodeURIComponent(keyword.value)}&cb=${callbackName}`
+//    document.body.appendChild(script)
   }, 150)
+})
+
+watch(currentEngine, () => {
+  if (keyword.value.trim()) {
+    // 触发更新建议（直接修改一次 keyword 触发上面的 watch，或者直接手动调用 fetch）
+    const temp = keyword.value
+    keyword.value = ''
+    nextTick(() => {
+      keyword.value = temp
+    })
+  }
 })
 </script>
 
