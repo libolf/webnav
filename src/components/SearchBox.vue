@@ -120,10 +120,11 @@ const handleInputFocus = () => {
 
 }
 
+let skipShowSearchHistory = false
 let suggestTimer = null
 watch(keyword, (newVal) => {
   clearTimeout(suggestTimer)
-  if (!newVal.trim()) {
+  if (!newVal.trim() && !skipShowSearchHistory) {
     const searchHistory = store.getSearchHistory()
     if (searchHistory.length > 0) {
       showSuggest.value = true
@@ -134,6 +135,7 @@ watch(keyword, (newVal) => {
     }
     return
   }
+  skipShowSearchHistory = false
   suggestTimer = setTimeout(async () => {
     try {
       // 调用 Vercel 中转 API，并传入当前所选的引擎 `currentEngine.value`
@@ -168,6 +170,7 @@ watch(currentEngine, () => {
   if (keyword.value.trim()) {
     // 触发更新建议（直接修改一次 keyword 触发上面的 watch，或者直接手动调用 fetch）
     const temp = keyword.value
+    skipShowSearchHistory = true
     keyword.value = ''
     nextTick(() => {
       keyword.value = temp
