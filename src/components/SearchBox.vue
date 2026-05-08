@@ -113,6 +113,23 @@ const handleGlobalKeydown = (e) => {
       }
     })
   }
+
+  if (e.key === '/') {
+    // 关键判断：如果当前焦点已经在 input、textarea 或 contenteditable 元素上，则不触发
+    const activeEl = document.activeElement;
+    const isTyping = activeEl.tagName === 'INPUT' ||
+      activeEl.tagName === 'TEXTAREA' ||
+      activeEl.isContentEditable;
+
+    if (!isTyping) {
+      e.preventDefault(); // 阻止在输入框里填入第一个 /
+      nextTick(() => {
+        if (keywordInput.value) {
+          keywordInput.value.focus()
+        }
+      })
+    }
+  }
 }
 
 onMounted(() => {
