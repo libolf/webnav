@@ -186,7 +186,7 @@ watch(keyword, (newVal) => {
       if (res.ok) {
         const data = await res.json()
         // 确保异步返回时，用户输入的内容没有被清空，再更新列表
-        if (keyword.value.trim()) {
+        if (document.hasFocus() && keyword.value.trim()) {
           suggestions.value = data
           showSuggest.value = suggestions.value.length > 0
         }
