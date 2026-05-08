@@ -135,11 +135,11 @@ const handleSearch = () => {
   if (currentIndex === 2) {
     url = url + '&ensearch=1'
   }
-  window.open(url, '_blank')
   showSuggest.value = false
   store.saveSearchHistory(keyword.value)
   keyword.value = ''
   selectIndex.value = -1
+  window.open(url, '_blank')
 }
 
 const selectSuggest = (text) => {
