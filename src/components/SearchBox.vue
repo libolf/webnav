@@ -137,10 +137,12 @@ const handleSearch = () => {
   }
   showSuggest.value = false
   store.saveSearchHistory(keyword.value)
-  keyword.value = ''
   selectIndex.value = -1
-  nextTick(()=>{
+  nextTick(() => {
     window.open(url, '_blank')
+    setTimeout(() => {
+      keyword.value = ''
+    })
   })
 }
 
@@ -151,12 +153,12 @@ const selectSuggest = (text) => {
 
 const handleInputFocus = () => {
   if (suggestions.value.length > 0) {
-    console.log("handle input focus")
+    console.log('handle input focus')
     showSuggest.value = true
   } else {
     const searchHistory = store.getSearchHistory()
     if (searchHistory.length > 0) {
-      console.log("handle input focus history")
+      console.log('handle input focus history')
       showSuggest.value = true
       suggestions.value = searchHistory
     }
@@ -164,14 +166,18 @@ const handleInputFocus = () => {
 
 }
 
+// 跳过显示搜索历史，当切换搜索引擎时
 let skipShowSearchHistory = false
 let suggestTimer = null
 watch(keyword, (newVal) => {
   clearTimeout(suggestTimer)
+  if (!document.hasFocus()) {
+    return
+  }
   if (!newVal.trim() && !skipShowSearchHistory) {
     const searchHistory = store.getSearchHistory()
     if (searchHistory.length > 0) {
-      console.log("watch history")
+      console.log('watch history')
       showSuggest.value = true
       suggestions.value = searchHistory
     } else {
@@ -191,7 +197,7 @@ watch(keyword, (newVal) => {
         // 确保异步返回时，用户输入的内容没有被清空，再更新列表
         if (document.hasFocus() && keyword.value.trim()) {
           suggestions.value = data
-          console.log("suggest")
+          console.log('suggest')
           showSuggest.value = suggestions.value.length > 0
         }
       }
