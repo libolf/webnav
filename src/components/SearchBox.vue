@@ -142,7 +142,8 @@ const handleSearch = () => {
     window.open(url, '_blank')
     setTimeout(() => {
       keyword.value = ''
-    })
+      keywordInput.value.blur();
+    }, 100)
   })
 }
 
