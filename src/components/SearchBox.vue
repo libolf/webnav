@@ -139,7 +139,9 @@ const handleSearch = () => {
   store.saveSearchHistory(keyword.value)
   keyword.value = ''
   selectIndex.value = -1
-  window.open(url, '_blank')
+  nextTick(()=>{
+    window.open(url, '_blank')
+  })
 }
 
 const selectSuggest = (text) => {
