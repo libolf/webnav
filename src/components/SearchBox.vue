@@ -170,18 +170,17 @@ const selectSuggest = (text) => {
 }
 
 const handleInputFocus = () => {
-  if (suggestions.value.length > 0) {
-    console.log('handle input focus')
-    showSuggest.value = true
-  } else {
+  if (keyword.value.trim().length === 0) {
     const searchHistory = store.getSearchHistory()
     if (searchHistory.length > 0) {
-      console.log('handle input focus history')
       showSuggest.value = true
       suggestions.value = searchHistory
     }
+  } else {
+    if (suggestions.value.length > 0) {
+      showSuggest.value = true
+    }
   }
-
 }
 
 // 跳过显示搜索历史，当切换搜索引擎时
@@ -195,7 +194,6 @@ watch(keyword, (newVal) => {
   if (!newVal.trim() && !skipShowSearchHistory) {
     const searchHistory = store.getSearchHistory()
     if (searchHistory.length > 0) {
-      console.log('watch history')
       showSuggest.value = true
       suggestions.value = searchHistory
     } else {
@@ -215,7 +213,6 @@ watch(keyword, (newVal) => {
         // 确保异步返回时，用户输入的内容没有被清空，再更新列表
         if (document.hasFocus() && keyword.value.trim()) {
           suggestions.value = data
-          console.log('suggest')
           showSuggest.value = suggestions.value.length > 0
         }
       }

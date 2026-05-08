@@ -83,7 +83,6 @@ export const store = reactive({
   // 辅助方法：从本地图标库获取图标，没有则返回默认图
   getIconFromCache(url) {
     const iconsMap = JSON.parse(localStorage.getItem(ICONS_CACHE_KEY) || '{}')
-    console.log('icon from cache ' + url + ' ' + iconsMap[url] == null)
     return iconsMap[url] || null // 返回 null 表示没缓存，需要去拉取
   },
 
