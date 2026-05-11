@@ -121,8 +121,8 @@ const handleTopToolClick = (type) =>{
 
 <template>
   <div class="app-wrapper">
-    <header class="main-header" @click="handleTopToolClick(3)">
-      <div class="header-left" @click="handleTopToolClick(1)">
+    <header class="main-header" @click.stop="handleTopToolClick(3)">
+      <div class="header-left" @click.stop="handleTopToolClick(1)">
         <div class="calendar-card">
           <span class="m-label">{{ new Date().getMonth() + 1 }}月</span>
           <span class="d-label">{{ new Date().getDate() }}</span>
@@ -133,7 +133,7 @@ const handleTopToolClick = (type) =>{
         </div>
       </div>
 
-      <div class="header-right" @click="handleTopToolClick(2)">
+      <div class="header-right" @click.stop="handleTopToolClick(2)">
         <div v-if="weatherData.today.desc" class="weather-panel">
           <div class="w-section">
             <span class="w-label">今日</span>
