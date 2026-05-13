@@ -235,6 +235,7 @@ watch(keyword, (newVal) => {
 })
 
 watch(currentEngine, () => {
+  keywordInput.value.focus()
   if (keyword.value.trim()) {
     // 触发更新建议（直接修改一次 keyword 触发上面的 watch，或者直接手动调用 fetch）
     const temp = keyword.value
