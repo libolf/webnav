@@ -246,6 +246,18 @@ watch(currentEngine, () => {
     })
   }
 })
+
+const clearKeyword = () => {
+  keyword.value = ''
+  suggestions.value = []
+  showSuggest.value = false
+  selectIndex.value = -1
+
+  setTimeout(()=>{
+    keywordInput.value.focus()
+    handleInputFocus()
+  }, 100)
+}
 </script>
 
 <template>
@@ -266,6 +278,11 @@ watch(currentEngine, () => {
                @keydown="handleKeyDown"
                @focus="handleInputFocus"
                placeholder="输入搜索内容..." />
+
+        <button v-if="keyword" class="clear-btn" @click="clearKeyword" title="清空内容">
+          &times;
+        </button>
+
         <Transition name="fade">
           <ul v-if="showSuggest" class="suggest-panel">
             <li v-for="(item, index) in suggestions" :key="index"
@@ -398,13 +415,40 @@ watch(currentEngine, () => {
 input {
   flex: 1;
   height: 100%;
-  padding: 0 20px;
+  padding: 0 45px 0 20px; /* 右侧留出 45px 给清空按钮 */
   font-size: 16px;
   border: 2px solid #4e6ef2;
   border-right: none;
   border-radius: 24px 0 0 24px;
   outline: none;
   box-sizing: border-box;
+}
+
+.clear-btn {
+  position: absolute;
+  right: 20px;             /* 悬浮在 input 右侧内部 */
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 28px;         /* 适当放大 × 号 */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  padding: 0;
+  line-height: 1;
+  z-index: 5;              /* 确保在输入框上层，但低于建议面板 */
+}
+
+.clear-btn:hover {
+  background-color: #f1f3f8; /* 悬浮时有个浅灰色圆圈底色 */
+  color: #666;
 }
 
 .search-btn {
