@@ -334,7 +334,7 @@ const clearKeyword = () => {
             :class="{ 'is-active': offsetIndex === gIdx - 1 }"
           >
             <a v-for="item in hotNews.slice((gIdx-1)*6, gIdx*6)" :key="item.index" :href="item.url"
-               target="_blank" class="hot-cell" :title="item.title">
+               target="_blank" class="hot-cell" :title="item.desc">
               <span class="h-idx" :class="'idx-' + item.index">{{ item.index }}</span>
               <span class="h-title">{{ item.title }}</span>
             </a>
