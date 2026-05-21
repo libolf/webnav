@@ -26,17 +26,40 @@ const totalGroups = computed(() => Math.ceil(hotNews.value.length / 6))
 
 const fetchHot = async () => {
   try {
-    const res = await fetch('https://zj.v.api.aa1.cn/api/baidu-rs/')
-    const rawText = await res.text()
-    const fixedText = rawText.replace(/([^\s:{[,])"([^\s:}\],])/g, '$1“$2')
-    const json = JSON.parse(fixedText)
-    if (json.code === 1) {
-      hotNews.value = json.data
+    // 1. 改为请求你本地的 Vercel 中转路由（对应你的 hot.js 文件）
+    const res = await fetch('/api/hot')
+    if (!res.ok) throw new Error('热搜接口响应异常')
+
+    // 2. 此时 hot.js 返回的已经是清洗干净且纯正的 JSON 数据了，直接 .json() 解析
+    const data = await res.json()
+
+    // 3. 根据你的 hot.js 返回数据格式进行适配赋值：
+    // 如果你的 hot.js 直接返回的是数组 [ {title, url, index}, ... ]
+    if (Array.isArray(data)) {
+      hotNews.value = data
+      startScroll()
+    }
+    // 如果你的 hot.js 依然保留了原 API 的外壳 { code: 1, data: [...] }
+    else if (data && data.code === 1) {
+      hotNews.value = data.data
       startScroll()
     }
   } catch (e) {
-    console.error('热搜获取失败')
+    // 打印具体错误，方便在控制台排查
+    console.error('热搜获取或解析失败:', e)
   }
+//  try {
+//    const res = await fetch('https://zj.v.api.aa1.cn/api/baidu-rs/')
+//    const rawText = await res.text()
+//    const fixedText = rawText.replace(/([^\s:{[,])"([^\s:}\],])/g, '$1“$2')
+//    const json = JSON.parse(fixedText)
+//    if (json.code === 1) {
+//      hotNews.value = json.data
+//      startScroll()
+//    }
+//  } catch (e) {
+//    console.error('热搜获取失败')
+//  }
 }
 
 const startScroll = () => {
