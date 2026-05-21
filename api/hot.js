@@ -12,6 +12,8 @@ export default async function handler(request, response) {
 
     const html = res.data;
 
+    console.log("raw html " + html)
+
     // 2. 🎯 正则表达式精准提取 <!--s-data:...--> 内的 JSON 字符串
     const match = html.match(/<!--s-data:({[\s\S]*?})-->/);
 
