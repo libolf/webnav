@@ -21,6 +21,7 @@ export default async function (req) {
     const ipUrl = `https://restapi.amap.com/v3/ip?ip=${ip}&key=${KEY}`;
     const ipRes = await fetch(ipUrl);
     const ipData = await ipRes.json();
+    console.log("weather ip data " + ipData)
 
     // 默认城市编码（如果定位失败则使用北京 110000）
     let adcode = '110000';

@@ -39,7 +39,12 @@ const fetchHot = async () => {
       hotNews.value = data
       startScroll()
     }
-    // 如果你的 hot.js 依然保留了原 API 的外壳 { code: 1, data: [...] }
+    // 如果返回的是 { success: true, data: [...] }
+    else if (data && data.success === true && Array.isArray(data.data)) { // ✨ 修改了这里
+      hotNews.value = data.data
+      startScroll()
+    }
+    // 保留以前的 code === 1 兼容（可选）
     else if (data && data.code === 1) {
       hotNews.value = data.data
       startScroll()
