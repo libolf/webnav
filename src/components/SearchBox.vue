@@ -351,7 +351,7 @@ const clearKeyword = () => {
           <div class="p-header">百度热搜榜 <span @click.stop="fetchHot">刷新</span></div>
           <div class="p-list">
             <a v-for="item in hotNews" :key="item.index" :href="item.url" target="_blank"
-               class="p-item" :title="item.title">
+               class="p-item" :title="item.desc">
               <span class="h-idx" :class="'idx-' + item.index">{{ item.index }}</span>
               <span class="p-title">{{ item.title }}</span>
             </a>
