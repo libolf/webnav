@@ -13,8 +13,11 @@ export default async function (req) {
 
   // 1. 获取客户端 IP
   // Vercel 会在 Header 中通过 x-forwarded-for 提供真实用户 IP
-  const forwarded = req.headers.get('x-forwarded-for');
-  const ip = forwarded ? forwarded.split(',')[0] : '';
+  let ip = req.headers.get('X-Real-User-IP');
+  if (!ip) {
+    const forwarded = req.headers.get('x-forwarded-for');
+    ip = forwarded ? forwarded.split(',')[0] : '';
+  }
 
   try {
     // 2. 调用高德 IP 定位接口获取 adcode
