@@ -83,6 +83,17 @@ onMounted(() => {
   if (store.nickName) {
     store.loginAndFetch(store.nickName)
   }
+
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      // 这里的经纬度是硬件（GPS/基站/Wi-Fi）给的，在黄岛就是黄岛的绝对坐标
+      const { latitude, longitude } = position.coords;
+      console.log('lat', latitude, 'lng', longitude)
+    },
+    (error) => {
+    }
+  );
 })
 
 // --- 原有交互逻辑 ---
