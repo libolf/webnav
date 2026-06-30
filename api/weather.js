@@ -11,6 +11,9 @@ export default async function (req) {
     return new Response(JSON.stringify({ error: 'Server key not configured' }), { status: 500 });
   }
 
+  let cfGeoData = req.headers.get('X-CF-Geo-Data')
+  console.log('cf geo data', cfGeoData)
+
   // 1. 获取客户端 IP
   // Vercel 会在 Header 中通过 x-forwarded-for 提供真实用户 IP
   let ip = req.headers.get('X-Real-User-IP');
