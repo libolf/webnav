@@ -82,6 +82,7 @@ export default async function(req) {
       }
     })
   } catch (e) {
+    console.error(e)
     return new Response(JSON.stringify({ error: 'Internal Server Error' }), { status: 500 })
   }
 }
