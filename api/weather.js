@@ -52,7 +52,7 @@ export default async function(req) {
     }
     console.log('ip', ip)
   }
-  console.log('city adcode', cityAdCode)
+  console.log('city adcode', cityAdCode, city)
 
   try {
 
@@ -77,8 +77,8 @@ export default async function(req) {
     return new Response(JSON.stringify(result), {
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-//        'Cache-Control': 'public, s-maxage=1800' // 缓存30分钟
+        'Access-Control-Allow-Origin': '*',
+        'Cache-Control': 'public, s-maxage=1800' // 缓存30分钟
       }
     })
   } catch (e) {
