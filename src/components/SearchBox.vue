@@ -78,20 +78,32 @@ const startScroll = () => {
 const stopScroll = () => clearInterval(scrollTimer)
 
 const handleClickOutside = (e) => {
-  // 1. 检查点击是否发生在“热搜完整面板”或者“展开热搜的箭头按钮”内
-  const clickedHotModule = e.target.closest('.hot-panel-full') || e.target.closest('.hot-trigger');
-
-  // 2. 检查点击是否发生在“搜索框及其建议面板”内部
-  const clickedSearchBox = searchContainer.value && searchContainer.value.contains(e.target);
-
-  // 如果点击的既不是热搜面板/按钮，关闭热搜
-  if (!clickedHotModule) {
-    isExpanded.value = false;
+  // 1. 如果点击的是搜索建议项、清空按钮或搜索按钮，直接拦截，不走全局的“点击空白关闭”
+  if (
+    e.target.closest('.suggest-panel') ||
+    e.target.closest('.search-btn') ||
+    e.target.closest('.clear-btn')
+  ) {
+    return
   }
 
-  // 如果点击的不在搜索容器内（比如点到了空地上），关闭建议框
+  // 2. 检查点击是否发生在“热搜完整面板”、“展开热搜的箭头按钮”以及“滚动热搜的单元格”内
+  const clickedHotModule =
+    e.target.closest('.hot-panel-full') ||
+    e.target.closest('.hot-trigger') ||
+    e.target.closest('.hot-cell'); // ✨ 新增保护热搜滚动条的链接
+
+  // 3. 检查点击是否发生在整个搜索容器内
+  const clickedSearchBox = searchContainer.value && searchContainer.value.contains(e.target);
+
+  // 如果点击的既不是热搜面板/按钮/链接，关闭全榜
+  if (!clickedHotModule) {
+    isExpanded.value = false
+  }
+
+  // 如果点击的不在搜索容器内，关闭建议框
   if (!clickedSearchBox) {
-    showSuggest.value = false;
+    showSuggest.value = false
   }
 }
 
@@ -199,6 +211,7 @@ const handleSearch = () => {
     setTimeout(() => {
       keyword.value = ''
       keywordInput.value.blur();
+      showSuggest.value = false
     }, 100)
   })
 }
