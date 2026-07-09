@@ -78,9 +78,20 @@ const startScroll = () => {
 const stopScroll = () => clearInterval(scrollTimer)
 
 const handleClickOutside = (e) => {
-  if (searchContainer.value && !searchContainer.value.contains(e.target)) {
-    isExpanded.value = false
-    showSuggest.value = false
+  // 1. 检查点击是否发生在“热搜完整面板”或者“展开热搜的箭头按钮”内
+  const clickedHotModule = e.target.closest('.hot-panel-full') || e.target.closest('.hot-trigger');
+
+  // 2. 检查点击是否发生在“搜索框及其建议面板”内部
+  const clickedSearchBox = searchContainer.value && searchContainer.value.contains(e.target);
+
+  // 如果点击的既不是热搜面板/按钮，关闭热搜
+  if (!clickedHotModule) {
+    isExpanded.value = false;
+  }
+
+  // 如果点击的不在搜索容器内（比如点到了空地上），关闭建议框
+  if (!clickedSearchBox) {
+    showSuggest.value = false;
   }
 }
 
@@ -347,7 +358,7 @@ const clearKeyword = () => {
       </div>
 
       <Transition name="fade">
-        <div v-if="isExpanded" class="hot-panel-full">
+        <div v-if="isExpanded" class="hot-panel-full" @click.stop>
           <div class="p-header">百度热搜榜 <span @click.stop="fetchHot">刷新</span></div>
           <div class="p-list">
             <a v-for="item in hotNews" :key="item.index" :href="item.url" target="_blank"

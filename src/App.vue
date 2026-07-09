@@ -60,7 +60,7 @@ const fetchWeather = async () => {
     weatherData.value = {
       today: {
         desc: data.liveWeather.weather,
-        tempRange: data.liveWeather.temperature + "°C",
+        tempRange: data.liveWeather.temperature + '°C'
       },
       tomorrow: {
         // 明天中午的时段通常在 hourly 数组的第 4 或第 5 个元素
@@ -106,14 +106,14 @@ const submitLogin = async () => {
   }
 }
 
-const handleTopToolClick = (type) =>{
+const handleTopToolClick = (type) => {
   let url
   if (type === 1) {
-    url = "https://www.baidu.com/s?wd=" + encodeURIComponent("日历")
+    url = 'https://www.baidu.com/s?wd=' + encodeURIComponent('日历')
   } else if (type === 2) {
-    url = "https://www.baidu.com/s?wd=" + encodeURIComponent("天气")
+    url = 'https://www.baidu.com/s?wd=' + encodeURIComponent('天气')
   } else {
-    url = "https://map.baidu.com/"
+    url = 'https://map.baidu.com/'
   }
   window.open(url, '_blank')
 }
@@ -121,7 +121,7 @@ const handleTopToolClick = (type) =>{
 
 <template>
   <div class="app-wrapper">
-    <header class="main-header" @click.stop="handleTopToolClick(3)">
+    <header class="main-header">
       <div class="header-left" @click.stop="handleTopToolClick(1)">
         <div class="calendar-card">
           <span class="m-label">{{ new Date().getMonth() + 1 }}月</span>
@@ -133,8 +133,11 @@ const handleTopToolClick = (type) =>{
         </div>
       </div>
 
-      <div class="header-right" @click.stop="handleTopToolClick(2)">
-        <div v-if="weatherData.today.desc" class="weather-panel">
+      <div class="header-center-map" @click="handleTopToolClick(3)"></div>
+
+      <div class="header-right">
+        <div v-if="weatherData.today.desc" class="weather-panel"
+             @click.stop="handleTopToolClick(2)">
           <div class="w-section">
             <span class="w-label">今日</span>
             <span class="w-desc">{{ weatherData.today.desc }}</span>
@@ -173,7 +176,8 @@ const handleTopToolClick = (type) =>{
             <h3>欢迎回来</h3>
             <p class="subtitle">输入昵称即可同步您的个人导航配置</p>
             <div class="form-item">
-              <input v-model="loginName" placeholder="请输入您的昵称" @keyup.enter="submitLogin" autofocus />
+              <input v-model="loginName" placeholder="请输入您的昵称" @keyup.enter="submitLogin"
+                     autofocus />
             </div>
             <div class="dialog-footer">
               <button @click="isShowLogin = false" class="btn-cancel">先随便看看</button>
@@ -189,57 +193,215 @@ const handleTopToolClick = (type) =>{
 </template>
 
 <style scoped>
-.app-wrapper { min-height: 100vh; background-color: #f6f8fa; }
+.app-wrapper {
+  min-height: 100vh;
+  background-color: #f6f8fa;
+}
 
 .main-header {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 10px 40px; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+  display: flex;
+  align-items: center;
+  padding: 10px 40px;
+  background: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
 }
 
 /* 左侧日期样式 */
-.header-left { display: flex; align-items: center; gap: 15px; cursor: pointer}
-.calendar-card {
-  width: 42px; height: 42px; border: 2px solid #333; border-radius: 10px;
-  display: flex; flex-direction: column; overflow: hidden;
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  cursor: pointer
 }
-.m-label { background: #ff4d4f; color: white; font-size: 10px; text-align: center; line-height: 16px; }
-.d-label { flex: 1; display: flex; justify-content: center; align-items: center; font-size: 18px; font-weight: bold; }
-.solar-text { font-size: 16px; font-weight: 600; color: #333; }
-.lunar-text { font-size: 15px; color: #fa8c16; }
+
+.calendar-card {
+  width: 42px;
+  height: 42px;
+  border: 2px solid #333;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.m-label {
+  background: #ff4d4f;
+  color: white;
+  font-size: 10px;
+  text-align: center;
+  line-height: 16px;
+}
+
+.d-label {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.solar-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.lunar-text {
+  font-size: 15px;
+  color: #fa8c16;
+}
+
+.header-center-map {
+  flex: 1;
+  height: 50px; /* 跟随导航栏高度调整，确保可点击面积足够大 */
+  cursor: pointer;
+}
 
 /* 右侧天气与用户 */
-.header-right { display: flex; align-items: center; gap: 20px; cursor: pointer}
-.weather-panel {
-  display: flex; align-items: center; gap: 12px;
-  background: #f8f9fa; padding: 6px 16px; border-radius: 20px; border: 1px solid #eee;
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
-.w-section { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #555; }
-.w-label { color: #999; font-size: 11px; }
-.w-temp { font-weight: bold; color: #4e6ef2; }
-.v-divider { width: 1px; height: 14px; background: #ddd; }
-.env-tag { font-size: 10px; padding: 1px 5px; border-radius: 4px; color: white; background: #52c41a; }
-.env-tag.中 { background: #faad14; }
-.env-tag.良 { background: #73d13d; }
-.city-info { font-size: 12px; color: #bbb; margin-left: 5px; }
 
-.user-area { cursor: pointer; }
-.login-btn {
-  font-size: 13px; color: #4e6ef2; border: 1px solid #4e6ef2;
-  padding: 4px 15px; border-radius: 20px; font-weight: 500;
+.weather-panel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f8f9fa;
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: 1px solid #eee;
+  cursor: pointer; /* 添加此行 */
 }
-.user-info { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; }
-.status-dot { width: 8px; height: 8px; background: #52c41a; border-radius: 50%; }
+
+.w-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #555;
+}
+
+.w-label {
+  color: #999;
+  font-size: 11px;
+}
+
+.w-temp {
+  font-weight: bold;
+  color: #4e6ef2;
+}
+
+.v-divider {
+  width: 1px;
+  height: 14px;
+  background: #ddd;
+}
+
+.env-tag {
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  color: white;
+  background: #52c41a;
+}
+
+.env-tag.中 {
+  background: #faad14;
+}
+
+.env-tag.良 {
+  background: #73d13d;
+}
+
+.city-info {
+  font-size: 12px;
+  color: #bbb;
+  margin-left: 5px;
+}
+
+.user-area {
+  cursor: pointer;
+}
+
+.login-btn {
+  font-size: 13px;
+  color: #4e6ef2;
+  border: 1px solid #4e6ef2;
+  padding: 4px 15px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  background: #52c41a;
+  border-radius: 50%;
+}
 
 /* 弹窗及动画 (保持原有) */
 .dialog-overlay {
-  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-  background: rgba(0,0,0,0.4); backdrop-filter: blur(8px);
-  display: flex; justify-content: center; align-items: center; z-index: 9999;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
 }
-.dialog-content { background: white; padding: 30px; border-radius: 24px; width: 340px; text-align: center; }
-.dialog-footer { margin-top: 25px; display: flex; flex-direction: column; gap: 10px; }
-.btn-confirm { background: #4e6ef2; color: white; padding: 12px; border-radius: 12px; border: none; cursor: pointer; }
-.btn-cancel { background: transparent; color: #999; border: none; cursor: pointer; }
-.fade-enter-active, .fade-leave-active { transition: all 0.3s ease; }
-.fade-enter-from, .fade-leave-to { opacity: 0; transform: translateY(10px); }
+
+.dialog-content {
+  background: white;
+  padding: 30px;
+  border-radius: 24px;
+  width: 340px;
+  text-align: center;
+}
+
+.dialog-footer {
+  margin-top: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btn-confirm {
+  background: #4e6ef2;
+  color: white;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-cancel {
+  background: transparent;
+  color: #999;
+  border: none;
+  cursor: pointer;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: all 0.3s ease;
+}
+
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
 </style>
