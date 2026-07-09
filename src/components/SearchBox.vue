@@ -358,7 +358,7 @@ const clearKeyword = () => {
             :class="{ 'is-active': offsetIndex === gIdx - 1 }"
           >
             <a v-for="item in hotNews.slice((gIdx-1)*6, gIdx*6)" :key="item.index" :href="item.url"
-               target="_blank" class="hot-cell" :title="item.desc">
+               target="_blank" class="hot-cell" :title="item.desc" @click="isExpanded = false">
               <span class="h-idx" :class="'idx-' + item.index">{{ item.index }}</span>
               <span class="h-title">{{ item.title }}</span>
             </a>
@@ -375,7 +375,7 @@ const clearKeyword = () => {
           <div class="p-header">百度热搜榜 <span @click.stop="fetchHot">刷新</span></div>
           <div class="p-list">
             <a v-for="item in hotNews" :key="item.index" :href="item.url" target="_blank"
-               class="p-item" :title="item.desc">
+               class="p-item" :title="item.desc" @click="isExpanded = false">
               <span class="h-idx" :class="'idx-' + item.index">{{ item.index }}</span>
               <span class="p-title">{{ item.title }}</span>
             </a>
