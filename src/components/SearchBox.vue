@@ -278,17 +278,22 @@ watch(keyword, (newVal) => {
     }
 
     if (currentEngine.value === 'bing') {
-      try {
-        // Bing 的 osjson 接口原生支持跨域 (CORS)
-        const res = await fetch(`https://api.bing.com/osjson.aspx?query=${encodeURIComponent(word)}`)
-        const data = await res.json()
-        if (keyword.value.trim() === word) {
-          suggestions.value = data[1] || []
+      const callbackName = `bing_cb_${Date.now()}`
+      const script = document.createElement('script')
+
+      window[callbackName] = (data) => {
+        // Bing 返回的格式通常是 [ "关键词", ["建议1", "建议2", ...] ]
+        if (keyword.value.trim() === word && data && data[1]) {
+          suggestions.value = data[1]
           showSuggest.value = suggestions.value.length > 0
         }
-      } catch (e) {
-        console.error('Bing 联想失败:', e)
+        document.body.removeChild(script)
+        delete window[callbackName]
       }
+
+      // 注意：增加了 JsonType 和 JsonCallback 参数
+      script.src = `https://api.bing.com/osjson.aspx?query=${encodeURIComponent(word)}&JsonType=callback&JsonCallback=${callbackName}`
+      document.body.appendChild(script)
       return
     }
 
