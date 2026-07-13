@@ -257,20 +257,70 @@ watch(keyword, (newVal) => {
   }
   skipShowSearchHistory = false
   suggestTimer = setTimeout(async () => {
-    try {
-      // 调用 Vercel 中转 API，并传入当前所选的引擎 `currentEngine.value`
-      const res = await fetch(`/api/suggest?engine=${currentEngine.value}&wd=${encodeURIComponent(newVal.trim())}`)
-      if (res.ok) {
-        const data = await res.json()
-        // 确保异步返回时，用户输入的内容没有被清空，再更新列表
-        if (document.hasFocus() && keyword.value.trim()) {
-          suggestions.value = data
+
+    const word = newVal.trim()
+
+    // --- 策略分流：百度和 Bing 直接走前端，不经过 Vercel ---
+    if (currentEngine.value === 'baidu') {
+      const callbackName = `baidu_cb_${Date.now()}`
+      const script = document.createElement('script')
+      window[callbackName] = (data) => {
+        if (keyword.value.trim() === word) {
+          suggestions.value = data.s
           showSuggest.value = suggestions.value.length > 0
         }
+        document.body.removeChild(script)
+        delete window[callbackName]
       }
-    } catch (e) {
-      console.error('获取联想词失败:', e)
+      script.src = `https://suggestion.baidu.com/su?wd=${encodeURIComponent(word)}&cb=${callbackName}`
+      document.body.appendChild(script)
+      return
     }
+
+    if (currentEngine.value === 'bing') {
+      try {
+        // Bing 的 osjson 接口原生支持跨域 (CORS)
+        const res = await fetch(`https://api.bing.com/osjson.aspx?query=${encodeURIComponent(word)}`)
+        const data = await res.json()
+        if (keyword.value.trim() === word) {
+          suggestions.value = data[1] || []
+          showSuggest.value = suggestions.value.length > 0
+        }
+      } catch (e) {
+        console.error('Bing 联想失败:', e)
+      }
+      return
+    }
+
+    if (currentEngine.value === 'google') {
+      try {
+        const res = await fetch(`/api/suggest?engine=google&wd=${encodeURIComponent(word)}`)
+        if (res.ok) {
+          const data = await res.json()
+          if (document.hasFocus() && keyword.value.trim() === word) {
+            suggestions.value = data
+            showSuggest.value = suggestions.value.length > 0
+          }
+        }
+      } catch (e) {
+        console.error('Google 联想失败:', e)
+      }
+    }
+
+//    try {
+//      // 调用 Vercel 中转 API，并传入当前所选的引擎 `currentEngine.value`
+//      const res = await fetch(`/api/suggest?engine=${currentEngine.value}&wd=${encodeURIComponent(newVal.trim())}`)
+//      if (res.ok) {
+//        const data = await res.json()
+//        // 确保异步返回时，用户输入的内容没有被清空，再更新列表
+//        if (document.hasFocus() && keyword.value.trim()) {
+//          suggestions.value = data
+//          showSuggest.value = suggestions.value.length > 0
+//        }
+//      }
+//    } catch (e) {
+//      console.error('获取联想词失败:', e)
+//    }
 //    const callbackName = `baidu_cb_${Date.now()}`
 //    const script = document.createElement('script')
 //    window[callbackName] = (data) => {
