@@ -110,26 +110,53 @@ const handleClickOutside = (e) => {
 
 // 监听键盘上下键与回车
 const handleKeyDown = (e) => {
+
+  if (e.key === 'Enter') {
+    e.preventDefault() // 阻止默认的回车行为
+
+    // 情况 A：选中了下拉列表项，填入关键词并搜索
+    if (showSuggest.value && selectIndex.value > -1 && selectIndex.value < suggestions.value.length) {
+      keyword.value = suggestions.value[selectIndex.value]
+    }
+
+    // 情况 B：无论是否选中下拉项，回车都触发搜索
+    handleSearch()
+    return
+  }
+
+  // 只有当建议框展示且有列表时，才响应上下箭头移动
   if (!showSuggest.value || suggestions.value.length === 0) return
 
   if (e.key === 'ArrowDown') {
-    e.preventDefault() // 阻止光标移到末尾
-    // 往下递增，到末尾后循环回 -1
+    e.preventDefault()
     selectIndex.value = (selectIndex.value + 1) >= suggestions.value.length ? -1 : selectIndex.value + 1
     scrollActiveIntoView()
   } else if (e.key === 'ArrowUp') {
-    e.preventDefault() // 阻止光标移到开头
-    // 往上递减，到 -1 后循环回末尾
+    e.preventDefault()
     selectIndex.value = selectIndex.value <= -1 ? suggestions.value.length - 1 : selectIndex.value - 1
     scrollActiveIntoView()
-  } else if (e.key === 'Enter') {
-    // 如果有选中的建议项，直接回车搜索该项
-    if (selectIndex.value > -1 && selectIndex.value < suggestions.value.length) {
-      e.preventDefault() // 阻止 input 默认的 enter 事件
-      keyword.value = suggestions.value[selectIndex.value]
-      handleSearch()
-    }
   }
+
+//  if (!showSuggest.value || suggestions.value.length === 0) return
+//
+//  if (e.key === 'ArrowDown') {
+//    e.preventDefault() // 阻止光标移到末尾
+//    // 往下递增，到末尾后循环回 -1
+//    selectIndex.value = (selectIndex.value + 1) >= suggestions.value.length ? -1 : selectIndex.value + 1
+//    scrollActiveIntoView()
+//  } else if (e.key === 'ArrowUp') {
+//    e.preventDefault() // 阻止光标移到开头
+//    // 往上递减，到 -1 后循环回末尾
+//    selectIndex.value = selectIndex.value <= -1 ? suggestions.value.length - 1 : selectIndex.value - 1
+//    scrollActiveIntoView()
+//  } else if (e.key === 'Enter') {
+//    // 如果有选中的建议项，直接回车搜索该项
+//    if (selectIndex.value > -1 && selectIndex.value < suggestions.value.length) {
+//      e.preventDefault() // 阻止 input 默认的 enter 事件
+//      keyword.value = suggestions.value[selectIndex.value]
+//      handleSearch()
+//    }
+//  }
 }
 
 // 确保选中的项在滚动视图内
@@ -381,7 +408,7 @@ const clearKeyword = () => {
 
     <div class="search-bar">
       <div class="input-wrapper">
-        <input ref="keywordInput" type="text" v-model="keyword" @keyup.enter="handleSearch"
+        <input ref="keywordInput" type="text" v-model="keyword"
                @keydown="handleKeyDown"
                @focus="handleInputFocus"
                placeholder="输入搜索内容..." />
